@@ -52,6 +52,24 @@ public class SeiToCsv {
 		return map;
 	}
 
+	private static Map<Integer, Double> financialEarnings() {
+		Map<Integer, Double> map = new TreeMap<>();
+		for (Entry<Integer, Map<Integer, Double>> e : monthAccountAmountMap.entrySet()) {
+			Integer month = e.getKey();
+			Double amount = 0.0;
+			for (Entry<Integer, Double> accountAmount : e.getValue().entrySet()) {
+				Integer account = accountAmount.getKey();
+				if (account < 3000)
+					continue;
+				if (account > 3999)
+					continue;
+				amount -= accountAmount.getValue();
+			}
+			map.put(month, amount);
+		}
+		return map;
+	}
+
 	private static void seiToCsv(String filename) throws Exception {
 		reset();
 		try (Stream<String> stream = Files.lines(Paths.get(filename), StandardCharsets.ISO_8859_1)) {
@@ -75,6 +93,12 @@ public class SeiToCsv {
 			System.out.println();
 			System.out.printf("%20s;", "Resultat");
 			for (Double amount : result.values()) {
+				System.out.printf("%10.0f;", amount);
+			}
+			System.out.println();
+			Map<Integer, Double> earnings = financialEarnings();
+			System.out.printf("%20s;", "Omsättning");
+			for (Double amount : earnings.values()) {
 				System.out.printf("%10.0f;", amount);
 			}
 			System.out.println();
