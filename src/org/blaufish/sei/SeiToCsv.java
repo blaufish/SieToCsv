@@ -86,24 +86,22 @@ public class SeiToCsv {
 				put(Integer.valueOf(month), Integer.valueOf(account), Double.valueOf(amount));
 			});
 			Map<Integer, Double> result = financialResult();
-			System.out.printf("%20s;", "");
+			System.out.print(";");
 			for (Integer month : result.keySet()) {
-				System.out.printf("%10d;", month);
+				System.out.printf("%d;", month);
 			}
 			System.out.println();
-			System.out.printf("%20s;", "Resultat");
+			System.out.printf("%s;", "Resultat");
 			for (Double amount : result.values()) {
-				System.out.printf("%10.0f;", amount);
+				System.out.printf("%.0f;", amount);
 			}
 			System.out.println();
 			Map<Integer, Double> earnings = financialEarnings();
-			System.out.printf("%20s;", "Omsättning");
+			System.out.printf("%s;", "Omsättning");
 			for (Double amount : earnings.values()) {
-				System.out.printf("%10.0f;", amount);
+				System.out.printf("%.0f;", amount);
 			}
 			System.out.println();
 		}
-
 	}
-
 }
