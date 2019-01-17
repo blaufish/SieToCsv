@@ -3,8 +3,10 @@ package org.blaufish.sei;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
@@ -79,12 +81,12 @@ public class SeiToCsv {
 					if (!line.startsWith("#PSALDO"))
 						break;
 					if (line.length() > 100) {
-						System.err.println("Ingoring suspicious long line.");
+						warn(filename, "Ingoring suspicious long line.");
 						break;
 					}
 					String[] splitted = line.split("[{}]");
 					if (splitted.length != 3) {
-						System.err.println("Ingoring suspicious malformed line.");
+						warn(filename, "Ingoring suspicious malformed line.");
 						break;
 					}
 					String[] leftWords = splitted[0].split(" ");
@@ -95,19 +97,29 @@ public class SeiToCsv {
 					String account = leftWords[3];
 					String dimensionInformation = splitted[1].trim();
 					if (dimensionInformation.length() != 0) {
-						System.err.printf("%s:%s (ignoring dimension information)\n", filename, dimensionInformation);
+						warn(filename, "%s (ignoring dimension information)", dimensionInformation);
 					}
 					String[] rightWords = splitted[2].trim().split(" ");
 					String amount = rightWords[0];
 					String secondZero = rightWords[1];
 					if (!secondZero.equals("0")) {
-						System.err.printf("%s:%s (don't know how to parse yet)\n", filename, line);
+						warn(filename, "%s (don't know how to parse yet)", line);
 						break;
 					}
 					put(Integer.valueOf(month), Integer.valueOf(account), Double.valueOf(amount));
 				} while (false);
 			});
 		}
+	}
+
+	static Set<String> emittedWarnings = new HashSet<>();
+
+	private static void warn(String filename, String warningFmt, Object... warningExtraArgs) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(filename).append(":").append(String.format(warningFmt, warningExtraArgs));
+		String warning = sb.toString();
+		if (emittedWarnings.add(warning))
+			System.err.println(warning);
 	}
 
 	private static void displayCsv() {
