@@ -15,8 +15,10 @@ public class SeiToCsv {
 			System.out.println("args: sei-file");
 			return;
 		}
+		reset();
 		for (String arg : args)
-			seiToCsv(arg);
+			parseSei(arg);
+		displayCsv();
 	}
 
 	static Map<Integer, Map<Integer, Double>> monthAccountAmountMap;
@@ -70,8 +72,7 @@ public class SeiToCsv {
 		return map;
 	}
 
-	private static void seiToCsv(String filename) throws Exception {
-		reset();
+	private static void parseSei(String filename) throws Exception {
 		try (Stream<String> stream = Files.lines(Paths.get(filename), StandardCharsets.ISO_8859_1)) {
 			stream.forEach(line -> {
 				do {
@@ -97,23 +98,26 @@ public class SeiToCsv {
 					put(Integer.valueOf(month), Integer.valueOf(account), Double.valueOf(amount));
 				} while (false);
 			});
-			Map<Integer, Double> result = financialResult();
-			System.out.print(";");
-			for (Integer month : result.keySet()) {
-				System.out.printf("%d;", month);
-			}
-			System.out.println();
-			System.out.printf("%s;", "Resultat");
-			for (Double amount : result.values()) {
-				System.out.printf("%.0f;", amount);
-			}
-			System.out.println();
-			Map<Integer, Double> earnings = financialEarnings();
-			System.out.printf("%s;", "Omsättning");
-			for (Double amount : earnings.values()) {
-				System.out.printf("%.0f;", amount);
-			}
-			System.out.println();
 		}
+	}
+
+	private static void displayCsv() {
+		Map<Integer, Double> result = financialResult();
+		System.out.print(";");
+		for (Integer month : result.keySet()) {
+			System.out.printf("%d;", month);
+		}
+		System.out.println();
+		System.out.printf("%s;", "Resultat");
+		for (Double amount : result.values()) {
+			System.out.printf("%.0f;", amount);
+		}
+		System.out.println();
+		Map<Integer, Double> earnings = financialEarnings();
+		System.out.printf("%s;", "Omsättning");
+		for (Double amount : earnings.values()) {
+			System.out.printf("%.0f;", amount);
+		}
+		System.out.println();
 	}
 }
