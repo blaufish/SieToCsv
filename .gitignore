@@ -1,6 +1,8 @@
 bin
-bin/*
+bin/**
+output
+output/**
 doc
 doc/SIE_filformat_ver_4B_080930.pdf
 example
-example/*
+example/**
