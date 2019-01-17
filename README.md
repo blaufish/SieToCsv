@@ -19,7 +19,7 @@ requiring preservation of copyright and license notices. Licensed
 works, modifications, and larger works may be distributed under
 different terms and without source code."
 
-# SIE Fornat #
+# SIE Format #
 
 The SIE format is an open standard for transferring accounting data between different software produced by different software suppliers.
 
