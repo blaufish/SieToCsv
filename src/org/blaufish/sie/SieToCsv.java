@@ -1,4 +1,4 @@
-package org.blaufish.sei;
+package org.blaufish.sie;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
-public class SeiToCsv {
+public class SieToCsv {
 
 	public static void main(String[] args) throws Exception {
 		if ((args == null) || (args.length == 0)) {
