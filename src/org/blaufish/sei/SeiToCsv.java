@@ -86,6 +86,13 @@ public class SeiToCsv {
 					String account = words[3];
 					String braces = words[4];
 					if (!braces.equals("{}")) {
+						/*
+						 * TODO implement support for dimensions, under dimensions
+						 * #DIM 20 "Avdelning"
+						 * #UNDERDIM 21 "Underavdelning" 20
+						 * #OBJECT 21 "0101" "Spadbarn"
+						 * #PSALDO 0 200801 4010 {21 "0101"} 13200.00
+						 */
 						System.err.printf("%s:%s (don't know how to parse yet)\n", filename, line);
 						break;
 					}
