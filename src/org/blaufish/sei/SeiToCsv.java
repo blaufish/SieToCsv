@@ -78,26 +78,28 @@ public class SeiToCsv {
 				do {
 					if (!line.startsWith("#PSALDO"))
 						break;
-					String[] words = line.split(" ");
-					String zero = words[1];
-					if (!zero.equals("0"))
-						return;
-					String month = words[2];
-					String account = words[3];
-					String braces = words[4];
-					if (!braces.equals("{}")) {
-						/*
-						 * TODO implement support for dimensions, under dimensions
-						 * #DIM 20 "Avdelning"
-						 * #UNDERDIM 21 "Underavdelning" 20
-						 * #OBJECT 21 "0101" "Spadbarn"
-						 * #PSALDO 0 200801 4010 {21 "0101"} 13200.00
-						 */
-						System.err.printf("%s:%s (don't know how to parse yet)\n", filename, line);
+					if (line.length() > 100) {
+						System.err.println("Ingoring suspicious long line.");
 						break;
 					}
-					String amount = words[5];
-					String secondZero = words[6];
+					String[] splitted = line.split("[{}]");
+					if (splitted.length != 3) {
+						System.err.println("Ingoring suspicious malformed line.");
+						break;
+					}
+					String[] leftWords = splitted[0].split(" ");
+					String zero = leftWords[1];
+					if (!zero.equals("0"))
+						return;
+					String month = leftWords[2];
+					String account = leftWords[3];
+					String dimensionInformation = splitted[1].trim();
+					if (dimensionInformation.length() != 0) {
+						System.err.printf("%s:%s (ignoring dimension information)\n", filename, dimensionInformation);
+					}
+					String[] rightWords = splitted[2].trim().split(" ");
+					String amount = rightWords[0];
+					String secondZero = rightWords[1];
 					if (!secondZero.equals("0")) {
 						System.err.printf("%s:%s (don't know how to parse yet)\n", filename, line);
 						break;
