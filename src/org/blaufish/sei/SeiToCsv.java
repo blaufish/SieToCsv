@@ -74,16 +74,28 @@ public class SeiToCsv {
 		reset();
 		try (Stream<String> stream = Files.lines(Paths.get(filename), StandardCharsets.ISO_8859_1)) {
 			stream.forEach(line -> {
-				if (!line.startsWith("#PSALDO"))
-					return;
-				String[] words = line.split(" ");
-				String zero = words[1];
-				if (!zero.equals("0"))
-					return;
-				String month = words[2];
-				String account = words[3];
-				String amount = words[5];
-				put(Integer.valueOf(month), Integer.valueOf(account), Double.valueOf(amount));
+				do {
+					if (!line.startsWith("#PSALDO"))
+						break;
+					String[] words = line.split(" ");
+					String zero = words[1];
+					if (!zero.equals("0"))
+						return;
+					String month = words[2];
+					String account = words[3];
+					String braces = words[4];
+					if (!braces.equals("{}")) {
+						System.err.printf("%s:%s (don't know how to parse yet)\n", filename, line);
+						break;
+					}
+					String amount = words[5];
+					String secondZero = words[6];
+					if (!secondZero.equals("0")) {
+						System.err.printf("%s:%s (don't know how to parse yet)\n", filename, line);
+						break;
+					}
+					put(Integer.valueOf(month), Integer.valueOf(account), Double.valueOf(amount));
+				} while (false);
 			});
 			Map<Integer, Double> result = financialResult();
 			System.out.print(";");
