@@ -4,13 +4,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
 class SieParser {
-	Map<Integer, Map<Integer, Double>> monthAccountAmountMap;
+	TreeMap<Integer, TreeMap<Integer, Double>> monthAccountAmountMap = new TreeMap<>();
 
 	void parseSei(String filename) throws Exception {
 		try (Stream<String> stream = Files.lines(Paths.get(filename), StandardCharsets.ISO_8859_1)) {
@@ -61,7 +60,7 @@ class SieParser {
 	}
 
 	private void put(Integer month, Integer account, Double amount) {
-		Map<Integer, Double> accountAmountMap = monthAccountAmountMap.get(month);
+		TreeMap<Integer, Double> accountAmountMap = monthAccountAmountMap.get(month);
 		if (accountAmountMap == null) {
 			accountAmountMap = new TreeMap<>();
 			monthAccountAmountMap.put(month, accountAmountMap);

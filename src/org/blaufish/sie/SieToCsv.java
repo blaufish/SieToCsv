@@ -1,6 +1,5 @@
 package org.blaufish.sie;
 
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -19,9 +18,9 @@ public class SieToCsv {
 		displayCsv();
 	}
 
-	private static Map<Integer, Double> financialResult() {
-		Map<Integer, Double> map = new TreeMap<>();
-		for (Entry<Integer, Map<Integer, Double>> e : parser.monthAccountAmountMap.entrySet()) {
+	private static TreeMap<Integer, Double> financialResult() {
+		TreeMap<Integer, Double> map = new TreeMap<>();
+		for (Entry<Integer, TreeMap<Integer, Double>> e : parser.monthAccountAmountMap.entrySet()) {
 			Integer month = e.getKey();
 			Double amount = 0.0;
 			for (Entry<Integer, Double> accountAmount : e.getValue().entrySet()) {
@@ -37,9 +36,9 @@ public class SieToCsv {
 		return map;
 	}
 
-	private static Map<Integer, Double> financialEarnings() {
-		Map<Integer, Double> map = new TreeMap<>();
-		for (Entry<Integer, Map<Integer, Double>> e : parser.monthAccountAmountMap.entrySet()) {
+	private static TreeMap<Integer, Double> financialEarnings() {
+		TreeMap<Integer, Double> map = new TreeMap<>();
+		for (Entry<Integer, TreeMap<Integer, Double>> e : parser.monthAccountAmountMap.entrySet()) {
 			Integer month = e.getKey();
 			Double amount = 0.0;
 			for (Entry<Integer, Double> accountAmount : e.getValue().entrySet()) {
@@ -56,7 +55,7 @@ public class SieToCsv {
 	}
 
 	private static void displayCsv() {
-		Map<Integer, Double> result = financialResult();
+		TreeMap<Integer, Double> result = financialResult();
 		System.out.print(";");
 		for (Integer month : result.keySet()) {
 			System.out.printf("%d;", month);
@@ -67,7 +66,7 @@ public class SieToCsv {
 			System.out.printf("%.0f;", amount);
 		}
 		System.out.println();
-		Map<Integer, Double> earnings = financialEarnings();
+		TreeMap<Integer, Double> earnings = financialEarnings();
 		System.out.printf("%s;", "Omsättning");
 		for (Double amount : earnings.values()) {
 			System.out.printf("%.0f;", amount);
