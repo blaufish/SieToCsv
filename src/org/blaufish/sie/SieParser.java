@@ -8,14 +8,19 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 class SieParser {
 	TreeMap<Integer, TreeMap<Integer, Double>> monthAccountAmountMap = new TreeMap<>();
+	TreeMap<Integer, String> kontoDescriptionMap = new TreeMap<>();
 	private Charset cp437;
+	private Pattern kontoPattern;
 
 	void parseSei(String filename) throws Exception {
 		setCp437Charset();
+		setKontoPattern();
 		try (Stream<String> stream = Files.lines(Paths.get(filename), cp437)) {
 			stream.forEach(line -> {
 				do {
@@ -26,6 +31,7 @@ class SieParser {
 					/* 5.8 Multiple space and tab accepted as space separator */
 					line = line.replaceAll("\\s+", " ");
 					parsePsaldo(filename, line);
+					parseKonto(filename, line);
 				} while (false);
 			});
 		}
@@ -57,6 +63,25 @@ class SieParser {
 			return;
 		}
 		put(Integer.valueOf(month), Integer.valueOf(account), Double.valueOf(amount));
+	}
+
+	private void parseKonto(String filename, String line) {
+		if (!line.startsWith("#KONTO"))
+			return;
+		Matcher matcher = kontoPattern.matcher(line);
+		if (!matcher.matches()) {
+			warn(filename, "Parsing failed: " + line);
+			return;
+		}
+		String kontoCode = matcher.group(1);
+		String kontoDescription = matcher.group(2);
+		kontoDescriptionMap.put(Integer.valueOf(kontoCode), kontoDescription);
+	}
+
+	private void setKontoPattern() {
+		if (kontoPattern != null)
+			return;
+		kontoPattern = Pattern.compile("^#KONTO (\\d+) \"(.*)\"$");
 	}
 
 	/*

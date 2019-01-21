@@ -1,6 +1,7 @@
 package org.blaufish.sie;
 
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -19,6 +20,8 @@ public class SieToCsv {
 		displayCsv();
 		System.out.println();
 		displayCsv2();
+		System.out.println();
+		displayCsv3();
 	}
 
 	private static TreeMap<Integer, Double> financialResult() {
@@ -28,11 +31,8 @@ public class SieToCsv {
 			Double amount = 0.0;
 			for (Entry<Integer, Double> accountAmount : e.getValue().entrySet()) {
 				Integer account = accountAmount.getKey();
-				if (account < 3000)
-					continue;
-				if (account > 8999)
-					continue;
-				amount -= accountAmount.getValue();
+				if (accountAffectResult(account))
+					amount -= accountAmount.getValue();
 			}
 			map.put(month, amount);
 		}
@@ -46,15 +46,44 @@ public class SieToCsv {
 			Double amount = 0.0;
 			for (Entry<Integer, Double> accountAmount : e.getValue().entrySet()) {
 				Integer account = accountAmount.getKey();
-				if (account < 3000)
-					continue;
-				if (account > 3999)
-					continue;
-				amount -= accountAmount.getValue();
+				if (accountIsEarning(account))
+					amount -= accountAmount.getValue();
 			}
 			map.put(month, amount);
 		}
 		return map;
+	}
+
+	private static TreeSet<Integer> financialCostsSet() {
+		TreeSet<Integer> set = new TreeSet<>();
+		for (Entry<Integer, TreeMap<Integer, Double>> e : parser.monthAccountAmountMap.entrySet()) {
+			for (Entry<Integer, Double> accountAmount : e.getValue().entrySet()) {
+				Integer account = accountAmount.getKey();
+				if (accountIsCost(account))
+					set.add(account);
+			}
+		}
+		return set;
+	}
+
+	private static boolean accountAffectResult(Integer account) {
+		return accountIsEarning(account) || accountIsCost(account);
+	}
+
+	private static boolean accountIsEarning(Integer account) {
+		if (account < 3000)
+			return false;
+		if (account > 3999)
+			return false;
+		return true;
+	}
+
+	private static boolean accountIsCost(Integer account) {
+		if (account < 4000)
+			return false;
+		if (account > 7999)
+			return false;
+		return true;
 	}
 
 	private static void displayCsv() {
@@ -97,4 +126,29 @@ public class SieToCsv {
 			System.out.println();
 		}
 	}
+
+	private static void displayCsv3() {
+		TreeSet<Integer> set = financialCostsSet();
+		Set<Integer> months = parser.monthAccountAmountMap.keySet();
+		System.out.print(";");
+		for (Integer month : months) {
+			System.out.printf("%d;", month);
+		}
+		System.out.println();
+		for (Entry<Integer, String> kontoDescriptionEntry : parser.kontoDescriptionMap.entrySet()) {
+			Integer kontoCode = kontoDescriptionEntry.getKey();
+			if (!set.contains(kontoCode))
+				continue;
+			System.out.printf("%s (%d);", kontoDescriptionEntry.getValue(), kontoCode);
+			for (Integer month : months) {
+				TreeMap<Integer, Double> accountAmountMap = parser.monthAccountAmountMap.get(month);
+				Double amount = accountAmountMap.get(kontoCode);
+				if (amount == null)
+					amount = 0.0d;
+				System.out.printf("%.0f;", amount);
+			}
+			System.out.println();
+		}
+	}
+
 }
