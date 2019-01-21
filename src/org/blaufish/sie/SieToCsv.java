@@ -66,6 +66,47 @@ public class SieToCsv {
 		return set;
 	}
 
+	private static TreeMap<String, TreeMap<Integer, Double>> financialCostMonthAmount() {
+		TreeSet<Integer> set = financialCostsSet();
+		Set<Integer> months = parser.monthAccountAmountMap.keySet();
+		Integer id = null;
+		String desc = null;
+		TreeMap<String, TreeMap<Integer, Double>> kontoDescriptionsMonthAmountMap = new TreeMap<>();
+		TreeMap<Integer, Double> monthAmountMap = null;
+		for (Entry<Integer, String> kontoDescriptionEntry : parser.kontoDescriptionMap.entrySet()) {
+			Integer kontoCode = kontoDescriptionEntry.getKey();
+			if (!set.contains(kontoCode))
+				continue;
+			String line = String.format("(%d) %s", kontoCode, kontoDescriptionEntry.getValue());
+			if (id == null) {
+				id = kontoCode;
+				desc = line;
+				monthAmountMap = new TreeMap<>();
+			} else {
+				if (id.intValue() / 1000 != kontoCode.intValue() / 1000) {
+					kontoDescriptionsMonthAmountMap.put(desc, monthAmountMap);
+					id = kontoCode;
+					desc = line;
+					monthAmountMap = new TreeMap<>();
+				} else {
+					desc = String.format("%s, %s", desc, line);
+				}
+			}
+			for (Integer month : months) {
+				TreeMap<Integer, Double> accountAmountMap = parser.monthAccountAmountMap.get(month);
+				Double amount = accountAmountMap.get(kontoCode);
+				if (amount == null)
+					amount = 0.0d;
+				Double oldAmount = monthAmountMap.get(month);
+				if (oldAmount == null)
+					oldAmount = 0.0d;
+				monthAmountMap.put(month, amount.doubleValue() + oldAmount.doubleValue());
+			}
+		}
+		kontoDescriptionsMonthAmountMap.put(desc, monthAmountMap);
+		return kontoDescriptionsMonthAmountMap;
+	}
+
 	private static boolean accountAffectResult(Integer account) {
 		return accountIsEarning(account) || accountIsCost(account);
 	}
@@ -128,47 +169,11 @@ public class SieToCsv {
 	}
 
 	private static void displayCsv3() {
-		TreeSet<Integer> set = financialCostsSet();
-		Set<Integer> months = parser.monthAccountAmountMap.keySet();
-		Integer id = null;
-		String desc = null;
-		TreeMap<String, TreeMap<Integer, Double>> kontoDescriptionsMonthAmountMap = new TreeMap<>();
-		TreeMap<Integer, Double> monthAmountMap = null;
-		for (Entry<Integer, String> kontoDescriptionEntry : parser.kontoDescriptionMap.entrySet()) {
-			Integer kontoCode = kontoDescriptionEntry.getKey();
-			if (!set.contains(kontoCode))
-				continue;
-			String line = String.format("(%d) %s", kontoCode, kontoDescriptionEntry.getValue());
-			if (id == null) {
-				id = kontoCode;
-				desc = line;
-				monthAmountMap = new TreeMap<>();
-			} else {
-				if (id.intValue() / 1000 != kontoCode.intValue() / 1000) {
-					kontoDescriptionsMonthAmountMap.put(desc, monthAmountMap);
-					id = kontoCode;
-					desc = line;
-					monthAmountMap = new TreeMap<>();
-				} else {
-					desc = String.format("%s, %s", desc, line);
-				}
-			}
-			for (Integer month : months) {
-				TreeMap<Integer, Double> accountAmountMap = parser.monthAccountAmountMap.get(month);
-				Double amount = accountAmountMap.get(kontoCode);
-				if (amount == null)
-					amount = 0.0d;
-				Double oldAmount = monthAmountMap.get(month);
-				if (oldAmount == null)
-					oldAmount = 0.0d;
-				monthAmountMap.put(month, amount.doubleValue() + oldAmount.doubleValue());
-			}
-		}
-		kontoDescriptionsMonthAmountMap.put(desc, monthAmountMap);
+		TreeMap<String, TreeMap<Integer, Double>> kontoDescriptionsMonthAmountMap = financialCostMonthAmount();
 
 		System.out.print(";");
-		Set<Integer> months2 = parser.monthAccountAmountMap.keySet();
-		for (Integer month : months2) {
+		Set<Integer> months = parser.monthAccountAmountMap.keySet();
+		for (Integer month : months) {
 			System.out.printf("%d;", month);
 		}
 		System.out.println();
