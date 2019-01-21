@@ -130,22 +130,54 @@ public class SieToCsv {
 	private static void displayCsv3() {
 		TreeSet<Integer> set = financialCostsSet();
 		Set<Integer> months = parser.monthAccountAmountMap.keySet();
-		System.out.print(";");
-		for (Integer month : months) {
-			System.out.printf("%d;", month);
-		}
-		System.out.println();
+		Integer id = null;
+		String desc = null;
+		TreeMap<String, TreeMap<Integer, Double>> kontoDescriptionsMonthAmountMap = new TreeMap<>();
+		TreeMap<Integer, Double> monthAmountMap = null;
 		for (Entry<Integer, String> kontoDescriptionEntry : parser.kontoDescriptionMap.entrySet()) {
 			Integer kontoCode = kontoDescriptionEntry.getKey();
 			if (!set.contains(kontoCode))
 				continue;
-			System.out.printf("%s (%d);", kontoDescriptionEntry.getValue(), kontoCode);
+			String line = String.format("(%d) %s", kontoCode, kontoDescriptionEntry.getValue());
+			if (id == null) {
+				id = kontoCode;
+				desc = line;
+				monthAmountMap = new TreeMap<>();
+			} else {
+				if (id.intValue() / 1000 != kontoCode.intValue() / 1000) {
+					kontoDescriptionsMonthAmountMap.put(desc, monthAmountMap);
+					id = kontoCode;
+					desc = line;
+					monthAmountMap = new TreeMap<>();
+				} else {
+					desc = String.format("%s, %s", desc, line);
+				}
+			}
 			for (Integer month : months) {
 				TreeMap<Integer, Double> accountAmountMap = parser.monthAccountAmountMap.get(month);
 				Double amount = accountAmountMap.get(kontoCode);
 				if (amount == null)
 					amount = 0.0d;
-				System.out.printf("%.0f;", amount);
+				Double oldAmount = monthAmountMap.get(month);
+				if (oldAmount == null)
+					oldAmount = 0.0d;
+				monthAmountMap.put(month, amount.doubleValue() + oldAmount.doubleValue());
+			}
+		}
+		kontoDescriptionsMonthAmountMap.put(desc, monthAmountMap);
+
+		System.out.print(";");
+		Set<Integer> months2 = parser.monthAccountAmountMap.keySet();
+		for (Integer month : months2) {
+			System.out.printf("%d;", month);
+		}
+		System.out.println();
+		for (Entry<String, TreeMap<Integer, Double>> entry : kontoDescriptionsMonthAmountMap.entrySet()) {
+			String line = entry.getKey();
+			System.out.printf("%s;", line);
+			TreeMap<Integer, Double> map = entry.getValue();
+			for (Double value : map.values()) {
+				System.out.printf("%.0f;", value);
 			}
 			System.out.println();
 		}
