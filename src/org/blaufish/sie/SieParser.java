@@ -19,40 +19,44 @@ class SieParser {
 		try (Stream<String> stream = Files.lines(Paths.get(filename), cp437)) {
 			stream.forEach(line -> {
 				do {
-					if (!line.startsWith("#PSALDO"))
-						break;
-					if (line.length() > 100) {
+					if (line.length() > 150) {
 						warn(filename, "Ingoring suspicious long line.");
-						break;
+						continue;
 					}
 					/* 5.8 Multiple space and tab accepted as space separator */
 					line = line.replaceAll("\\s+", " ");
-					String[] splitted = line.split("[{}]");
-					if (splitted.length != 3) {
-						warn(filename, "Ingoring suspicious malformed line.");
-						break;
-					}
-					String[] leftWords = splitted[0].split(" ");
-					String zero = leftWords[1];
-					if (!zero.equals("0"))
-						return;
-					String month = leftWords[2];
-					String account = leftWords[3];
-					String dimensionInformation = splitted[1].trim();
-					if (dimensionInformation.length() != 0) {
-						warn(filename, "%s (ignoring dimension information)", dimensionInformation);
-					}
-					String[] rightWords = splitted[2].trim().split(" ");
-					String amount = rightWords[0];
-					String secondZero = rightWords[1];
-					if (!secondZero.equals("0")) {
-						warn(filename, "%s (don't know how to parse yet)", line);
-						break;
-					}
-					put(Integer.valueOf(month), Integer.valueOf(account), Double.valueOf(amount));
+					parsePsaldo(filename, line);
 				} while (false);
 			});
 		}
+	}
+
+	private void parsePsaldo(String filename, String line) {
+		if (!line.startsWith("#PSALDO"))
+			return;
+		String[] splitted = line.split("[{}]");
+		if (splitted.length != 3) {
+			warn(filename, "Ingoring suspicious malformed line.");
+			return;
+		}
+		String[] leftWords = splitted[0].split(" ");
+		String zero = leftWords[1];
+		if (!zero.equals("0"))
+			return;
+		String month = leftWords[2];
+		String account = leftWords[3];
+		String dimensionInformation = splitted[1].trim();
+		if (dimensionInformation.length() != 0) {
+			warn(filename, "%s (ignoring dimension information)", dimensionInformation);
+		}
+		String[] rightWords = splitted[2].trim().split(" ");
+		String amount = rightWords[0];
+		String secondZero = rightWords[1];
+		if (!secondZero.equals("0")) {
+			warn(filename, "%s (don't know how to parse yet)", line);
+			return;
+		}
+		put(Integer.valueOf(month), Integer.valueOf(account), Double.valueOf(amount));
 	}
 
 	/*
