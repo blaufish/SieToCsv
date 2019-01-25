@@ -17,11 +17,11 @@ public class SieToCsv {
 		parser = new SieParser();
 		for (String arg : args)
 			parser.parseSei(arg);
-		displayCsv();
+		displayCsvEarningsVsResult();
 		System.out.println();
-		displayCsv2();
+		displayCsvEarningsPerYear();
 		System.out.println();
-		displayCsv3();
+		displayCsvFinancialCostGroupedPerThousandCodeGroup();
 	}
 
 	private static TreeMap<Integer, Double> financialResult() {
@@ -127,7 +127,7 @@ public class SieToCsv {
 		return true;
 	}
 
-	private static void displayCsv() {
+	private static void displayCsvEarningsVsResult() {
 		TreeMap<Integer, Double> result = financialResult();
 		System.out.print(";");
 		for (Integer month : result.keySet()) {
@@ -147,7 +147,7 @@ public class SieToCsv {
 		System.out.println();
 	}
 
-	private static void displayCsv2() {
+	private static void displayCsvEarningsPerYear() {
 		TreeMap<Integer, Double> earnings = financialEarnings();
 		TreeSet<Integer> years = new TreeSet<>();
 		for (int yearmonth : earnings.keySet())
@@ -168,7 +168,7 @@ public class SieToCsv {
 		}
 	}
 
-	private static void displayCsv3() {
+	private static void displayCsvFinancialCostGroupedPerThousandCodeGroup() {
 		TreeMap<String, TreeMap<Integer, Double>> kontoDescriptionsMonthAmountMap = financialCostMonthAmount();
 
 		System.out.print(";");
