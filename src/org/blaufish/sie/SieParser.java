@@ -54,6 +54,7 @@ class SieParser {
 		String dimensionInformation = splitted[1].trim();
 		if (dimensionInformation.length() != 0) {
 			warn(filename, "%s (ignoring dimension information)", dimensionInformation);
+			return;
 		}
 		String[] rightWords = splitted[2].trim().split(" ");
 		String amount = rightWords[0];
@@ -62,7 +63,12 @@ class SieParser {
 			warn(filename, "%s (don't know how to parse yet)", line);
 			return;
 		}
-		put(Integer.valueOf(month), Integer.valueOf(account), Double.valueOf(amount));
+		Integer imonth = Integer.valueOf(month);
+		Integer iaccount = Integer.valueOf(account);
+		Double damount = Double.valueOf(amount);
+		//if (iaccount >= 3000 && iaccount <= 5000)
+		//	System.out.printf("month:%d account:%d amount:%f line:%s\n", imonth, iaccount, damount, line);
+		put(imonth, iaccount, damount);
 	}
 
 	private void parseKonto(String filename, String line) {
