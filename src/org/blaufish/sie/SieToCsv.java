@@ -17,10 +17,14 @@ public class SieToCsv {
 		parser = new SieParser();
 		for (String arg : args)
 			parser.parseSei(arg);
+		System.out.println();
+		System.out.println("csvEarningsVsResult");
 		displayCsvEarningsVsResult();
 		System.out.println();
+		System.out.println("csvEarningsPerYear");
 		displayCsvEarningsPerYear();
 		System.out.println();
+		System.out.println("CsvFinancialCostGroupedPerThousandCodeGroup");
 		displayCsvFinancialCostGroupedPerThousandCodeGroup();
 	}
 
