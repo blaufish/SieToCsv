@@ -1,5 +1,6 @@
 package org.blaufish.sie;
 
+import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -26,6 +27,9 @@ public class SieToCsv {
 		System.out.println();
 		System.out.println("CsvFinancialCostGroupedPerThousandCodeGroup");
 		displayCsvFinancialCostGroupedPerThousandCodeGroup();
+		System.out.println();
+		System.out.println("csv1930");
+		displayCsv1930();
 	}
 
 	private static TreeMap<Integer, Double> financialResult() {
@@ -192,4 +196,23 @@ public class SieToCsv {
 		}
 	}
 
+	private static void displayCsv1930() {
+		System.out.print(";");
+		Set<Integer> months = parser.monthAccountAmountMap.keySet();
+		for (Integer month : months) {
+			System.out.printf("%d;", month);
+		}
+		Double acc = 0d;
+		System.out.println();
+		System.out.printf("%d;", 1930);
+		Collection<TreeMap<Integer, Double>> values = parser.monthAccountAmountMap.values();
+		for (TreeMap<Integer, Double> value : values) {
+			Double v1930 = value.get(1930);
+			v1930 = v1930 == null ? 0d : v1930;
+			acc += v1930;
+			System.out.printf("%.0f;", acc);
+
+		}
+		System.out.println();
+	}
 }
